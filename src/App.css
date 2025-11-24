@@ -109,3 +109,11 @@
   font-size: 1rem;
 }
 .btn-add:hover { background: #218838; }
+.btn-delete {
+  background: #dc3545; /* 赤色 */
+  color: white;
+  margin-left: auto; /* 他のボタンから離す */
+}
+.btn-delete:hover {
+  background: #c82333;
+}

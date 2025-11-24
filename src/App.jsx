@@ -6,7 +6,7 @@ import ReactFlow, {
   applyEdgeChanges,
   addEdge, 
   ReactFlowProvider,
-  useReactflow
+  useReactFlow
 } from 'reactflow';
 import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
@@ -46,7 +46,7 @@ const initialNodes = [
       description: '外力が働かない場合、系の総運動量は保存される。',
       category: 'mechanics' 
     },
-    style: { background: '#E8F5E9', border: '1px solid #4CAF50', width: 150 }
+    style: { background: '#E3F2FD', border: '1px solid #4CAF50', width: 150 }
   },
 ];
 
@@ -65,10 +65,11 @@ const categoryStyles = {
 
 // --- メインコンポーネント ---
 function PhysicsMapper() {
+  //console.log("start physicsmapper");
   // ノードとエッジの状態管理
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
-  const [idCount, setIdCount] = usestate(4);
+  const [idCount, setIdCount] = useState(4);
   
   // 選択されたノードの情報を保持する状態
   const [selectedNodeId, setSelectedNodeId] = useState(null);
@@ -98,7 +99,7 @@ function PhysicsMapper() {
   // 背景（キャンバス）をクリックしたら選択解除
   const onPaneClick = useCallback(
     () => {
-      setSelectedNodeData(null);
+      setSelectedNodeId(null);
       setIsEditing(false);
     },
     []
@@ -133,6 +134,17 @@ function PhysicsMapper() {
     setIsEditing(true); // 即編集モードへ
   };
 
+  const handleDeleteNode = () => {
+    if (!selectedNodeId) return; // 選択ノードがなければ何もしない
+
+    // 1. nodes配列から該当ノードをフィルタリングして削除
+    setNodes((nds) => nds.filter((node) => node.id !== selectedNodeId));
+    
+    // 2. 選択状態を解除 (インスペクターを空の状態に戻す)
+    setSelectedNodeId(null);
+    setIsEditing(false);
+  };
+
   const handleSave = () => {
     setNodes((nds) =>
       nds.map((node) => {
@@ -151,6 +163,13 @@ function PhysicsMapper() {
     setIsEditing(false); // 閲覧モードに戻る
   };
 
+  const onEdgeDoubleClick = useCallback((event, edge) => {
+    // ダブルクリックしたエッジをedges配列からフィルタリングして削除
+    setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+    // 標準のブラウザメニューが開かないように阻止
+    event.preventDefault(); 
+  }, []);
+
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
 
   return (
@@ -165,6 +184,7 @@ function PhysicsMapper() {
           onConnect={onConnect}
           onNodeClick={onNodeClick}
           onPaneClick={onPaneClick}
+          onEdgeDoubleClick={onEdgeDoubleClick}
           fitView // 初期表示時に全体が見えるように調整
         >
           <Background color="#aaa" gap={16} />
@@ -214,6 +234,7 @@ function PhysicsMapper() {
               <div className="action-buttons">
                 <button className="btn btn-primary" onClick={handleSave}>保存</button>
                 <button className="btn btn-secondary" onClick={() => setIsEditing(false)}>キャンセル</button>
+                <button className="btn btn-delete" onClick={handleDeleteNode}>削除</button>
               </div>
             </div>
             ) : (
@@ -243,6 +264,7 @@ function PhysicsMapper() {
   );
 }
 export default function App(){
+  console.log("I am function App");
   return(
     <ReactFlowProvider>
       <PhysicsMapper/>
