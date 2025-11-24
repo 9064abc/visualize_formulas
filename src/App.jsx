@@ -12,6 +12,8 @@ import { InlineMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import 'reactflow/dist/style.css'; // React Flowの基本スタイル
 import './App.css';
+import CustomNode from './Customnode.jsx';
+const nodeTypes = { custom: CustomNode };
 
 // --- 初期データ（ここを将来的にユーザー入力やJSON読み込みにする） ---
 const flowKey = 'physics-mapper-flow';
@@ -84,6 +86,7 @@ function PhysicsMapper() {
   const [nodes, setNodes] = useState(initialFlow.nodes);
   const [edges, setEdges] = useState(initialFlow.edges);
   const [idCount, setIdCount] = useState(initialFlow.idCount);
+  const [nodeContentType, setNodeContentType] = useState('label');
   
   // 選択されたノードの情報を保持する状態
   const [selectedNodeId, setSelectedNodeId] = useState(null);
@@ -221,7 +224,12 @@ function PhysicsMapper() {
         style.opacity = 1;
     }
 
-    return { ...node, style };
+    const data = {
+      ...node.data,
+      nodeContentType: nodeContentType, // 'label' or 'formula'
+    };
+
+    return { ...node, style, type: 'custom', data};
   });
   
   // エッジも同様にスタイルを適用する（ハイライトされていないエッジは薄くする）
@@ -251,6 +259,7 @@ function PhysicsMapper() {
           onNodeClick={onNodeClick}
           onPaneClick={onPaneClick}
           onEdgeDoubleClick={onEdgeDoubleClick}
+          nodeTypes={nodeTypes}
           fitView // 初期表示時に全体が見えるように調整
         >
           <Background color="#aaa" gap={16} />
@@ -260,6 +269,20 @@ function PhysicsMapper() {
 
       {/* 右側：詳細パネル領域 */}
       <div className="inspector-area">
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+          <button 
+            className={`btn ${nodeContentType === 'label' ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => setNodeContentType('label')}
+          >
+            タイトル表示
+          </button>
+          <button 
+            className={`btn ${nodeContentType === 'formula' ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => setNodeContentType('formula')}
+          >
+            数式表示
+          </button>
+        </div>
         <button className="btn btn-add" onClick={handleAddNode}>
           + 新しい法則を追加
         </button>

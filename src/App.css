@@ -117,3 +117,23 @@
 .btn-delete:hover {
   background: #c82333;
 }
+/* ノードの表示領域の調整（CustomNode.jsで使われているクラス名） */
+.node-label-only, .node-formula-only {
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  padding: 10px;
+  width: 90%;
+  box-sizing: border-box; /* パディングを含めて幅を計算 */
+}
+
+/* ラベル表示の調整（数式と同じサイズ感にするため） */
+.node-label-only {
+  line-height: 1.2;
+}
+
+/* 数式表示の調整 */
+.node-formula-only {
+  /* 数式描画エリアのパディング */
+  padding: 10px 5px;
+}
