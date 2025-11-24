@@ -50,3 +50,62 @@
   text-align: center;
   margin-top: 50px;
 }
+/* 編集フォームのスタイル */
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.edit-form label {
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 2px;
+}
+
+.edit-form input,
+.edit-form textarea,
+.edit-form select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.edit-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* ボタン類 */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.btn-primary { background: #007bff; color: white; }
+.btn-primary:hover { background: #0056b3; }
+
+.btn-secondary { background: #6c757d; color: white; }
+.btn-secondary:hover { background: #5a6268; }
+
+.btn-add {
+  width: 100%;
+  padding: 10px;
+  background: #28a745;
+  color: white;
+  margin-bottom: 20px;
+  font-size: 1rem;
+}
+.btn-add:hover { background: #218838; }
