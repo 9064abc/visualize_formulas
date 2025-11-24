@@ -10,15 +10,17 @@ function CustomNode({ data }) {
   return (
     <div className="custom-node-content">
       <Handle type="target" position={Position.Top} />
-      {nodeContentType === 'label' && (
-        <div className="node-label-only">{label}</div>
-      )}
+      <div style={{ pointerEvents: 'none', width: '100%', padding: '0 5px' }}>
+        {nodeContentType === 'label' && (
+            <div className="node-label-only">{label}</div>
+        )}
 
-      {nodeContentType === 'formula' && formula && (
-        <div className="node-formula-only">
-          <InlineMath math={formula} />
-        </div>
-      )}
+        {nodeContentType === 'formula' && formula && (
+            <div className="node-formula-only">
+                <InlineMath math={formula} />
+            </div>
+        )}
+      </div>
       <Handle type="source" position={Position.Bottom} />
     </div>
   );

@@ -93,6 +93,7 @@ function PhysicsMapper() {
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({label: '', formula: '', description: '', category: 'default'})
   const [highlightedNodes, setHighlightedNodes] = useState(new Set());
+  const [relatedNodesInfo, setRelatedNodesInfo] = useState({sources: [], targets: []});
 
   // React Flowのインスタンス操作用（画面中心取得のため）
   const { project, getViewport } = useReactFlow();
@@ -116,18 +117,39 @@ function PhysicsMapper() {
       setSelectedNodeId(node.id);
       setFormData(node.data);
       setIsEditing(false);
+
+      const sources = [];
+      const targets = [];
       const newHighlightedNodes = new Set();
       newHighlightedNodes.add(node.id); // 自身を選択
 
       // 関連するエッジを検索し、関連ノードIDを収集
       edges.forEach(edge => {
-        if (edge.source === node.id || edge.target === node.id) {
-            newHighlightedNodes.add(edge.source);
-            newHighlightedNodes.add(edge.target);
+        if (edge.target === node.id) {
+          const sourceNode = nodes.find(n => n.id === edge.source);
+          if (sourceNode) {
+              sources.push({
+                  id: sourceNode.id,
+                  formula: sourceNode.data.formula
+              });
+              newHighlightedNodes.add(sourceNode.id);
+          }
         }
+      
+        // 2. 導出先 (このノードを Source とするエッジ)
+        if (edge.source === node.id) {
+          const targetNode = nodes.find(n => n.id === edge.target);
+          if (targetNode) {
+              targets.push({
+                  id: targetNode.id,
+                  formula: targetNode.data.formula
+              });
+              newHighlightedNodes.add(targetNode.id);
+          }
+        }  
       }
     );
-
+    setRelatedNodesInfo({sources, targets});
     setHighlightedNodes(newHighlightedNodes);
     },
     [edges]
@@ -139,6 +161,7 @@ function PhysicsMapper() {
       setSelectedNodeId(null);
       setIsEditing(false);
       setHighlightedNodes(new Set());
+      setRelatedNodesInfo({ sources: [], targets: [] });
     },
     []
   );
@@ -335,6 +358,33 @@ function PhysicsMapper() {
               <div className="description-box">
                 <h3>解説</h3>
                 <p>{selectedNode.data.description}</p>
+                <div className="related-info-panel" style={{ marginTop: '20px', borderTop: '1px solid #ccc', paddingTop: '10px' }}>
+                    <h4 style={{ marginBottom: '5px' }}>&gt;&gt;&gt; 導出元</h4>
+                    {relatedNodesInfo.sources.length > 0 ? (
+                        <ul style={{ listStyle: 'none', paddingLeft: '0' }}>
+                            {relatedNodesInfo.sources.map((info, index) => (
+                                <li key={index} style={{ marginBottom: '5px' }}>
+                                    <InlineMath math={info.formula || ''} />
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p style={{ fontStyle: 'italic', fontSize: '14px', color: '#666' }}>（導出元となる法則はありません）</p>
+                    )}
+                    
+                    <h4 style={{ marginBottom: '5px', marginTop: '15px' }}>&gt;&gt;&gt; 導出先</h4>
+                    {relatedNodesInfo.targets.length > 0 ? (
+                        <ul style={{ listStyle: 'none', paddingLeft: '0' }}>
+                            {relatedNodesInfo.targets.map((info, index) => (
+                                <li key={index} style={{ marginBottom: '5px' }}>
+                                    <InlineMath math={info.formula || ''} />
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p style={{ fontStyle: 'italic', fontSize: '14px', color: '#666' }}>（この法則から導かれる法則はありません）</p>
+                    )}
+                </div>
               </div>
               <div style={{marginTop: '20px'}}>
                 <button className="btn btn-primary" onClick={() => setIsEditing(true)}>
