@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect} from 'react';
 import ReactFlow, { 
   Controls, 
   Background, 
@@ -14,7 +14,59 @@ import 'reactflow/dist/style.css'; // React Flowの基本スタイル
 import './App.css';
 
 // --- 初期データ（ここを将来的にユーザー入力やJSON読み込みにする） ---
-const initialNodes = [
+const flowKey = 'physics-mapper-flow';
+
+const getInitialFlow = () => {
+  if (typeof window === 'undefined') {
+    // サーバーサイドレンダリング環境など、windowオブジェクトがない場合は初期データを返す
+    return { 
+      nodes: [], 
+      edges: [],
+      idCount: 1 
+    };
+  }
+  
+  const savedFlow = localStorage.getItem(flowKey);
+  
+  if (savedFlow) {
+    const { nodes, edges, idCount } = JSON.parse(savedFlow);
+
+    // IDカウンターの安全な初期化
+    // 既存ノードの最大IDを求め、その次の番号から開始するようにする
+    const maxId = nodes.reduce((max, node) => {
+        const idNum = parseInt(node.id.split('-')[1]);
+        return idNum > max ? idNum : max;
+    }, 0);
+    
+    return {
+      nodes: nodes,
+      edges: edges,
+      idCount: maxId > 0 ? maxId + 1 : 1 // 1からスタート
+    };
+  }
+
+  // データがなければデフォルトの初期データを返す
+  return {
+    nodes: [
+      { 
+        id: 'node-1', position: { x: 250, y: 50 }, 
+        data: { label: '運動方程式', formula: 'F = ma', description: '物体に働く力 F は、質量 m と加速度 a の積に等しい。', category: 'mechanics' },
+        style: { background: '#E3F2FD', border: '1px solid #2196F3', width: 180 }
+      },
+      { 
+        id: 'node-2', position: { x: 100, y: 250 }, 
+        data: { label: '加速度の定義', formula: 'a = \\frac{dv}{dt}', description: '加速度 a は速度 v の時間微分である。', category: 'mechanics' },
+        style: { background: '#E3F2FD', border: '1px solid #2196F3', width: 180 }
+      },
+    ],
+    edges: [
+      { id: 'e1-2', source: 'node-2', target: 'node-1', animated: true, label: '代入' }
+    ],
+    idCount: 3
+  };
+};
+
+/*const initialNodes = [
   { 
     id: '1', 
     position: { x: 250, y: 50 }, 
@@ -31,7 +83,7 @@ const initialNodes = [
     position: { x: 100, y: 200 }, 
     data: { 
       label: '加速度の定義', 
-      formula: 'a = \frac{dv}{dt}', 
+      formula: 'a = \\frac{dv}{dt}', 
       description: '加速度 a は速度 v の時間微分である。',
       category: 'mechanics' 
     },
@@ -53,7 +105,7 @@ const initialNodes = [
 const initialEdges = [
   { id: 'e1-2', source: '2', target: '1', animated: true, label: '代入' },
   { id: 'e1-3', source: '1', target: '3', label: '積分' }
-];
+];*/
 
 const categoryStyles = {
   mechanics: { background: '#E3F2FD', border: '1px solid #2196F3' }, // 青系
@@ -65,11 +117,14 @@ const categoryStyles = {
 
 // --- メインコンポーネント ---
 function PhysicsMapper() {
+
+  const initialFlow = getInitialFlow();
+
   //console.log("start physicsmapper");
   // ノードとエッジの状態管理
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
-  const [idCount, setIdCount] = useState(4);
+  const [nodes, setNodes] = useState(initialFlow.nodes);
+  const [edges, setEdges] = useState(initialFlow.edges);
+  const [idCount, setIdCount] = useState(initialFlow.idCount);
   
   // 選択されたノードの情報を保持する状態
   const [selectedNodeId, setSelectedNodeId] = useState(null);
@@ -78,6 +133,12 @@ function PhysicsMapper() {
 
   // React Flowのインスタンス操作用（画面中心取得のため）
   const { project, getViewport } = useReactFlow();
+
+  useEffect(() => {
+    // nodes, edges, idCount のいずれかが変更されたらローカルストレージに保存する
+    const flowToSave = JSON.stringify({ nodes, edges, idCount });
+    localStorage.setItem(flowKey, flowToSave);
+  }, [nodes, edges, idCount]);
 
   // ノードがドラッグされた時の処理
   const onNodesChange = useCallback((changes) => setNodes((nds) => applyNodeChanges(changes, nds)),[]);

@@ -2,7 +2,7 @@
   "name": "visualize",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://9064abc.github.io/visualize_formulas",
+  "homepage": "https://9064abc.github.io/formulas_map",
   "type": "module",
   "scripts": {
     "dev": "vite",
