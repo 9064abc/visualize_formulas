@@ -173,7 +173,7 @@ function PhysicsMapper() {
     const centerX = (-x + (window.innerWidth - 300) / 2) / zoom;
     const centerY = (-y + window.innerHeight / 2) / zoom;
 
-    const newId = `${idCount}`;
+    const newId = `node-${idCount}`;
     const newNode = {
       id: newId,
       position: { x: centerX - 90, y: centerY - 50 }, // 中心から少しずらす（ノードの半分のサイズ分）
@@ -371,7 +371,7 @@ function PhysicsMapper() {
                     ) : (
                         <p style={{ fontStyle: 'italic', fontSize: '14px', color: '#666' }}>（導出元となる法則はありません）</p>
                     )}
-                    
+
                     <h4 style={{ marginBottom: '5px', marginTop: '15px' }}>&gt;&gt;&gt; 導出先</h4>
                     {relatedNodesInfo.targets.length > 0 ? (
                         <ul style={{ listStyle: 'none', paddingLeft: '0' }}>
