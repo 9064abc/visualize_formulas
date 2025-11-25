@@ -123,7 +123,7 @@
   font-weight: bold;
   text-align: center;
   padding: 10px;
-  width: 90%;
+  width: 100%;
   box-sizing: border-box; /* パディングを含めて幅を計算 */
   white-space: nowrap;    /* 強制的に改行させない */
   word-wrap: normal;
@@ -138,14 +138,19 @@
 .node-formula-only {
   /* 数式描画エリアのパディング */
   padding: 10px 5px;
-  overflow-x: auto;
+  /*overflow-x: auto;*/
+  width: 100%;
+  text-align: center;
 }
 
 .node-formula-only .katex-display, .node-formula-only .katex {
   white-space: nowrap;
   word-wrap: normal;
   /* 数式が長すぎた場合に備えて、ノード内部のスクロールは維持 */
-  overflow-x: auto; 
+  /*overflow-x: auto;*/ 
+  display: block; 
+  text-align: center;
+  margin: 0 auto;
 }
 
 .react-flow__node {
@@ -154,6 +159,7 @@
   min-width: 150px;       /* App.jsのminWidthと連携 */
   padding: 0;
   border-radius: 4px;
+  align-items: center;
   box-sizing: border-box;
 }
 
